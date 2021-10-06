@@ -1,6 +1,8 @@
 use crate::core::capability;
 use crate::core::capability::{capability_set, Capability};
-use crate::core::event::{BitmapEvent, RdpEvent};
+use crate::core::event::{
+    BitmapEvent, PointerWheel, RdpEvent,
+};
 use crate::core::gcc::KeyboardLayout;
 use crate::core::mcs;
 use crate::core::tpkt;
@@ -374,6 +376,58 @@ pub fn ts_pointer_event(flags: Option<u16>, x: Option<u16>, y: Option<u16>) -> T
             "xPos" => U16::LE(x.unwrap_or(0)),
             "yPos" => U16::LE(y.unwrap_or(0))
         ],
+    }
+}
+
+impl From<PointerEvent> for TSInputEvent {
+    fn from(pointer: PointerEvent) -> Self {
+        // Pointer are sent to global channel
+        // Compute flags
+        let mut flags = match pointer.button {
+            PointerButton::Left => PointerFlag::PtrflagsButton1 as u16,
+            PointerButton::Right => PointerFlag::PtrflagsButton2 as u16,
+            PointerButton::Middle => PointerFlag::PtrflagsButton3 as u16,
+            _ => 0,
+        };
+        // Clamp wheel delta to the allowed range.
+        let wheel_delta: i16 = if pointer.wheel_delta > 0x00FF {
+            0x00FF
+        } else if pointer.wheel_delta < -0x00FF {
+            -0x0FF
+        } else {
+            pointer.wheel_delta
+        };
+        let wheel_delta_flag = if wheel_delta > 0 {
+            wheel_delta as u16
+        } else if wheel_delta < 0 {
+            -wheel_delta as u16 | PointerFlag::PtrflagsWheelNegative as u16
+        } else {
+            0
+        };
+        flags |= match pointer.wheel {
+            PointerWheel::Vertical => PointerFlag::PtrflagsWheel as u16 | wheel_delta_flag,
+            PointerWheel::Horizontal => PointerFlag::PtrflagsHwheel as u16 | wheel_delta_flag,
+            _ => 0,
+        };
+        if pointer.button == PointerButton::None && pointer.wheel == PointerWheel::None {
+            flags |= PointerFlag::PtrflagsMove as u16;
+        }
+
+        if pointer.down {
+            flags |= PointerFlag::PtrflagsDown as u16;
+        }
+
+        ts_pointer_event(Some(flags), Some(pointer.x), Some(pointer.y))
+    }
+}
+
+impl From<KeyboardEvent> for TSInputEvent {
+    fn from(key: KeyboardEvent) -> Self {
+        let mut flags: u16 = 0;
+        if !key.down {
+            flags |= KeyboardFlag::KbdflagsRelease as u16;
+        }
+        ts_keyboard_event(Some(flags), Some(key.code))
     }
 }
 
