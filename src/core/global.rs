@@ -1,7 +1,7 @@
 use crate::core::capability;
 use crate::core::capability::{capability_set, Capability};
 use crate::core::event::{
-    BitmapEvent, PointerWheel, RdpEvent,
+    BitmapEvent, KeyboardEvent, PointerButton, PointerEvent, PointerWheel, RdpEvent,
 };
 use crate::core::gcc::KeyboardLayout;
 use crate::core::mcs;
