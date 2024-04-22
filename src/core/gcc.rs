@@ -252,7 +252,7 @@ pub fn client_core_data(parameter: Option<ClientData>) -> Component {
             ),
         "earlyCapabilityFlags" => U16::LE(CapabilityFlag::RnsUdCsSupportErrinfoPDU as u16),
         "clientDigProductId" => vec![0; 64],
-        "connectionType" => 0_u8,
+        "connectionType" => ConnectionType::BroadbandHigh as u8,
         "pad1octet" => 0_u8,
         "serverSelectedProtocol" => U32::LE(client_parameter.server_selected_protocol)
     ]
