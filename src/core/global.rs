@@ -875,7 +875,7 @@ impl Client {
                         | capability::GeneralExtraFlag::FastpathOutputSupported as u16
                 )))),
                 capability_set(Some(capability::ts_bitmap_capability_set(
-                    Some(0x0018),
+                    Some(0x0018), // HIGH_COLOR_24BPP
                     Some(self.width),
                     Some(self.height)
                 ))),
