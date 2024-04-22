@@ -58,7 +58,6 @@ enum AfInet {
     AfInet = 0x00002,
     AfInet6 = 0x0017,
 }
-
 #[allow(dead_code)]
 enum PerformanceFlags {
     None = 0x00000000,
@@ -72,6 +71,13 @@ enum PerformanceFlags {
     PerfEnableDesktopComposition = 0x00000100,
 }
 
+static DEFAULT_PERFORMANCE_FLAGS: u32 = PerformanceFlags::PerfDisableWallpaper as u32 | 
+                                        PerformanceFlags::PerfDisableFullWindowDrag as u32 |
+                                        PerformanceFlags::PerfDisableMenuAnims as u32 |
+                                        PerformanceFlags::PerfDisableTheming as u32 |
+                                        PerformanceFlags::PerfDisableCursorShadow as u32 |
+                                        PerformanceFlags::PerfDisableCursorSettings as u32 ;
+
 /// On RDP version > 5
 /// Client have to send IP information
 fn rdp_extended_infos() -> Component {
@@ -83,7 +89,7 @@ fn rdp_extended_infos() -> Component {
         "clientDir" => b"\x00\x00".to_vec(),
         "clientTimeZone" => vec![0; 172],
         "clientSessionId" => U32::LE(0),
-        "performanceFlags" => U32::LE(0)
+        "performanceFlags" => U32::LE(DEFAULT_PERFORMANCE_FLAGS)
     ]
 }
 
