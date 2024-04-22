@@ -59,6 +59,19 @@ enum AfInet {
     AfInet6 = 0x0017,
 }
 
+#[allow(dead_code)]
+enum PerformanceFlags {
+    None = 0x00000000,
+    PerfDisableWallpaper = 0x00000001,
+    PerfDisableFullWindowDrag = 0x00000002,
+    PerfDisableMenuAnims = 0x00000004,
+    PerfDisableTheming = 0x00000008,
+    PerfDisableCursorShadow = 0x00000020,
+    PerfDisableCursorSettings = 0x0000040,
+    PerfEnableFontSmoothing = 0x00000080,
+    PerfEnableDesktopComposition = 0x00000100,
+}
+
 /// On RDP version > 5
 /// Client have to send IP information
 fn rdp_extended_infos() -> Component {
