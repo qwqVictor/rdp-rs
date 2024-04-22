@@ -1,4 +1,4 @@
-use crate::core::event::{PointerButton, RdpEvent};
+use crate::core::event::{PointerButton, PointerWheel, RdpEvent};
 use crate::core::gcc::KeyboardLayout;
 use crate::core::global;
 use crate::core::global::{ts_keyboard_event, ts_pointer_event, KeyboardFlag, PointerFlag};
@@ -109,10 +109,31 @@ impl<S: AsyncRead + AsyncWrite + Unpin> RdpClient<S> {
                     _ => flags |= PointerFlag::PtrflagsMove as u16,
                 }
 
+                // Clamp wheel delta to the allowed range.
+                let wheel_delta: i16 = if pointer.wheel_delta > 0x00FF {
+                    0x00FF
+                } else if pointer.wheel_delta < -0x00FF {
+                    -0x0FF
+                } else {
+                    pointer.wheel_delta
+                };
+                let wheel_delta_flag = if wheel_delta > 0 {
+                    wheel_delta as u16
+                } else if wheel_delta < 0 {
+                    -wheel_delta as u16 | PointerFlag::PtrflagsWheelNegative as u16
+                } else {
+                    0
+                };
+                flags |= match pointer.wheel {
+                    PointerWheel::Vertical => PointerFlag::PtrflagsWheel as u16 | wheel_delta_flag,
+                    PointerWheel::Horizontal => PointerFlag::PtrflagsHwheel as u16 | wheel_delta_flag,
+                    _ => 0,
+                };
+
                 if pointer.down {
                     flags |= PointerFlag::PtrflagsDown as u16;
                 }
-
+                
                 self.global
                     .write_input_event(
                         ts_pointer_event(Some(flags), Some(pointer.x), Some(pointer.y)),
