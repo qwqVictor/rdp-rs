@@ -195,6 +195,17 @@ pub struct ClientData {
     pub name: String,
 }
 
+#[repr(u8)]
+pub enum ConnectionType {
+    Modem = 0x01,
+    BroadbandLow = 0x02,
+    Satellite = 0x03,
+    BroadbandHigh = 0x04,
+    WAN = 0x05,
+    LAN = 0x06,
+    AutoDetect = 0x07,
+}
+
 /// This is the first client specific data
 ///
 /// This field are obsolete and for modern
