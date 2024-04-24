@@ -167,6 +167,13 @@ pub struct KeyboardEvent {
     pub down: bool,
 }
 
+pub struct UnicodeKeyEvent {
+    /// Unicode character
+    pub code: u16,
+    /// State of the key
+    pub down: bool,
+}
+
 /// All event handle by RDP protocol implemented by rdp-rs
 pub enum RdpEvent {
     /// Classic bitmap event
@@ -175,4 +182,6 @@ pub enum RdpEvent {
     Pointer(PointerEvent),
     /// Keyboard event
     Key(KeyboardEvent),
+    /// Unicode event
+    UnicodeKey(UnicodeKeyEvent)
 }

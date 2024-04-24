@@ -1,7 +1,7 @@
 use crate::core::event::{PointerButton, PointerWheel, RdpEvent};
 use crate::core::gcc::KeyboardLayout;
 use crate::core::global;
-use crate::core::global::{ts_keyboard_event, ts_pointer_event, KeyboardFlag, PointerFlag};
+use crate::core::global::{ts_keyboard_event, ts_unicode_keyboard_event, ts_pointer_event, KeyboardFlag, PointerFlag};
 use crate::core::mcs;
 use crate::core::sec;
 use crate::core::tpkt;
@@ -150,6 +150,18 @@ impl<S: AsyncRead + AsyncWrite + Unpin> RdpClient<S> {
                 self.global
                     .write_input_event(
                         ts_keyboard_event(Some(flags), Some(key.code)),
+                        &mut self.mcs,
+                    )
+                    .await
+            }
+            RdpEvent::UnicodeKey(unicode) => {
+                let mut flags: u16 = 0;
+                if !unicode.down {
+                    flags |= KeyboardFlag::KbdflagsRelease as u16;
+                }
+                self.global
+                    .write_input_event(
+                        ts_unicode_keyboard_event(Some(flags), Some(unicode.code)),
                         &mut self.mcs,
                     )
                     .await

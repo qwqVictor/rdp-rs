@@ -455,6 +455,19 @@ pub fn ts_keyboard_event(flags: Option<u16>, key_code: Option<u16>) -> TSInputEv
     }
 }
 
+/// Unicode input keyboard event
+/// Use to send scancode directly
+pub fn ts_unicode_keyboard_event(flags: Option<u16>, unicode_code: Option<u16>) -> TSInputEvent {
+    TSInputEvent {
+        event_type: InputEventType::InputEventUnicode,
+        message: component![
+            "keyboardFlags" => U16::LE(flags.unwrap_or(0)),
+            "unicodeCode" => U16::LE(unicode_code.unwrap_or(0)),
+            "pad2Octets" => U16::LE(0)
+        ],
+    }
+}
+
 /// Fast Path update (Not a PDU)
 ///
 /// https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-rdpbcgr/a1c4caa8-00ed-45bb-a06e-5177473766d3
