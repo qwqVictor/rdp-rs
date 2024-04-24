@@ -84,7 +84,7 @@ fn rdp_extended_infos() -> Component {
     component![
         "clientAddressFamily" => U16::LE(AfInet::AfInet as u16),
         "cbClientAddress" => DynOption::new(U16::LE(0), |x| MessageOption::Size("clientAddress".to_string(), x.inner() as usize + 2)),
-        "clientAddress" => b"\x00\x00".to_vec(),
+        "clientAddress" => b"\x00\x00\x00\x00".to_vec(),
         "cbClientDir" => U16::LE(0),
         "clientDir" => b"\x00\x00".to_vec(),
         "clientTimeZone" => vec![0; 172],
