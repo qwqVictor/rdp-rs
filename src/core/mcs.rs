@@ -440,7 +440,7 @@ impl<S: AsyncRead + AsyncWrite + Unpin> Client<S> {
     /// This function check if the client
     /// version protocol choose is 5+
     pub fn is_rdp_version_5_plus(&self) -> bool {
-        self.server_data.as_ref().unwrap().rdp_version == Version::RdpVersion5plus
+        self.server_data.as_ref().unwrap().rdp_version as u32 >= Version::RdpVersion5plus as u32
     }
 
     /// Getter of the user id negotiated during connection steps

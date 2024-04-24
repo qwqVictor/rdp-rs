@@ -25,8 +25,8 @@ pub enum Version {
 impl From<u32> for Version {
     fn from(e: u32) -> Self {
         match e {
-            0x00080001 => Version::RdpVersion5plus,
-            0x00080004 => Version::RdpVersion,
+            0x00080001 => Version::RdpVersion,
+            0x00080004 => Version::RdpVersion5plus,
             _ => Version::Unknown,
         }
     }
