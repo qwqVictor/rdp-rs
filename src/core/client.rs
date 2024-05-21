@@ -4,6 +4,7 @@ use crate::core::global;
 use crate::core::global::{ts_keyboard_event, ts_unicode_keyboard_event, ts_pointer_event, KeyboardFlag, PointerFlag};
 use crate::core::mcs;
 use crate::core::sec;
+use crate::core::sec::DEFAULT_PERFORMANCE_FLAGS;
 use crate::core::tpkt;
 use crate::core::x224;
 use crate::model::error::{Error, RdpError, RdpErrorKind, RdpResult};
@@ -226,6 +227,7 @@ pub struct Connector {
     /// Use network level authentication
     /// default TRUE
     use_nla: bool,
+    performance_flags: u32,
 }
 
 impl Connector {
@@ -254,6 +256,7 @@ impl Connector {
             check_certificate: false,
             name: "rdp-rs".to_string(),
             use_nla: true,
+            performance_flags: DEFAULT_PERFORMANCE_FLAGS
         }
     }
 
@@ -334,6 +337,7 @@ impl Connector {
                 &"".to_string(),
                 &"".to_string(),
                 self.auto_logon,
+                self.performance_flags
             )
             .await?;
         } else {
@@ -343,6 +347,7 @@ impl Connector {
                 &self.username,
                 &self.password,
                 self.auto_logon,
+                self.performance_flags
             )
             .await?;
         }
@@ -374,6 +379,12 @@ impl Connector {
         self.domain = domain;
         self.username = username;
         self.password = password;
+        self
+    }
+
+    /// Set performance flags mask
+    pub fn set_performance_flags(mut self, performance_flags: u32) -> Self {
+        self.performance_flags = performance_flags;
         self
     }
 

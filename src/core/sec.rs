@@ -71,16 +71,16 @@ enum PerformanceFlags {
     PerfEnableDesktopComposition = 0x00000100,
 }
 
-static DEFAULT_PERFORMANCE_FLAGS: u32 = PerformanceFlags::PerfDisableWallpaper as u32 | 
-                                        PerformanceFlags::PerfDisableFullWindowDrag as u32 |
-                                        PerformanceFlags::PerfDisableMenuAnims as u32 |
-                                        PerformanceFlags::PerfDisableTheming as u32 |
-                                        PerformanceFlags::PerfDisableCursorShadow as u32 |
-                                        PerformanceFlags::PerfDisableCursorSettings as u32 ;
+pub static DEFAULT_PERFORMANCE_FLAGS: u32 = PerformanceFlags::PerfDisableWallpaper as u32 | 
+                                            PerformanceFlags::PerfDisableFullWindowDrag as u32 |
+                                            PerformanceFlags::PerfDisableMenuAnims as u32 |
+                                            PerformanceFlags::PerfDisableTheming as u32 |
+                                            PerformanceFlags::PerfDisableCursorShadow as u32 |
+                                            PerformanceFlags::PerfDisableCursorSettings as u32 ;
 
 /// On RDP version > 5
 /// Client have to send IP information
-fn rdp_extended_infos() -> Component {
+fn rdp_extended_infos(performance_flags: u32) -> Component {
     component![
         "clientAddressFamily" => U16::LE(AfInet::AfInet as u16),
         "cbClientAddress" => U16::LE(1),
@@ -89,7 +89,7 @@ fn rdp_extended_infos() -> Component {
         "clientDir" => b"\x00".to_vec(),
         "clientTimeZone" => vec![0; 172],
         "clientSessionId" => U32::LE(0),
-        "performanceFlags" => U32::LE(DEFAULT_PERFORMANCE_FLAGS)
+        "performanceFlags" => U32::LE(performance_flags)
     ]
 }
 
@@ -102,6 +102,7 @@ fn rdp_infos(
     username: &String,
     password: &String,
     auto_logon: bool,
+    performance_flags: u32
 ) -> Component {
     let mut domain_format = domain.to_unicode();
     domain_format.push(0);
@@ -136,7 +137,7 @@ fn rdp_infos(
         "password" => password_format,
         "alternateShell" => b"\x00\x00".to_vec(),
         "workingDir" => b"\x00\x00".to_vec(),
-        "extendedInfos" => if is_extended_info { rdp_extended_infos() } else { component![] }
+        "extendedInfos" => if is_extended_info { rdp_extended_infos(performance_flags) } else { component![] }
     ]
 }
 
@@ -166,6 +167,7 @@ pub async fn connect<T: AsyncRead + AsyncWrite + Unpin>(
     username: &String,
     password: &String,
     auto_logon: bool,
+    performance_flags: u32
 ) -> RdpResult<()> {
     mcs.write(
         &"global".to_string(),
@@ -177,7 +179,8 @@ pub async fn connect<T: AsyncRead + AsyncWrite + Unpin>(
                 domain,
                 username,
                 password,
-                auto_logon
+                auto_logon,
+                performance_flags
             )
         ],
     )
